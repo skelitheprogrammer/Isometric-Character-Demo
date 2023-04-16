@@ -10,7 +10,6 @@ namespace Content.Player.PlayerMovement.Systems
 {
     public class PlayerVelocityApplierSystem : IEcsInitSystem, IEcsRunSystem
     {
-        private readonly PlayerMovementData _movementData;
         private EcsWorld _world;
 
         private EcsFilter _filter;
@@ -18,20 +17,17 @@ namespace Content.Player.PlayerMovement.Systems
         private EcsPool<MoveInputComponent> _moveInputPool;
         private EcsPool<DirectionComponent> _directionPool;
         private EcsPool<EntityTargetComponent> _targetPool;
-
-        public PlayerVelocityApplierSystem(PlayerMovementData movementData)
-        {
-            _movementData = movementData;
-        }
-
+        private EcsPool<PlayerMovementData> _movementDataPool;
+        
         public void Init(IEcsSystems systems)
         {
             _world = systems.GetWorld();
-            _filter = _world.Filter<PlayerTag>().Inc<UnitVelocity>().Inc<EntityTargetComponent>().Inc<MoveInputComponent>().End();
+            _filter = _world.Filter<PlayerTag>().Inc<UnitVelocity>().Inc<EntityTargetComponent>().Inc<MoveInputComponent>().Inc<PlayerMovementData>().End();
             _targetPool = _world.GetPool<EntityTargetComponent>();
             _velocityPool = _world.GetPool<UnitVelocity>();
             _directionPool = _world.GetPool<DirectionComponent>();
             _moveInputPool = _world.GetPool<MoveInputComponent>();
+            _movementDataPool = _world.GetPool<PlayerMovementData>();
         }
 
         public void Run(IEcsSystems systems)
@@ -43,7 +39,7 @@ namespace Content.Player.PlayerMovement.Systems
                     continue;
                 }
                 
-                float speed = _movementData.MoveSpeed;
+                float speed = _movementDataPool.Get(i).MoveSpeed;
                 DirectionComponent directionComponent = _directionPool.Get(targetEntity);
                 Vector2 moveInput = _moveInputPool.Get(i).MoveInput;
                 Vector3 currentDirection = directionComponent.RightDirection * moveInput.x + directionComponent.ForwardDirection * moveInput.y;

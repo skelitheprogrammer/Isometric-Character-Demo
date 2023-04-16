@@ -9,13 +9,13 @@ namespace Content.Player.PlayerMovement
     {
         public IEcsSystem[] Systems { get; }
 
-        public PlayerMovementSystemGroup(TimeService timeService, PlayerMovementData movementData, PlayerRotationData rotationData)
+        public PlayerMovementSystemGroup(TimeService timeService)
         {
             Systems = new IEcsSystem[]
             {
-                new PlayerVelocityApplierSystem(movementData),
+                new PlayerVelocityApplierSystem(),
                 new PlayerMoveSystem(timeService),
-                new PlayerRotationSystem(timeService, rotationData),
+                new PlayerRotationSystem(timeService),
             };
         }
     }

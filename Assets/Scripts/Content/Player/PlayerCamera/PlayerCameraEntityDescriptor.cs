@@ -14,7 +14,7 @@ namespace Content.Player.PlayerCamera
         {
             new EntityDescriptorExtender<CameraEntityDescriptor>(),
             new ComponentProvider<PlayerCameraTag>(),
-            new ComponentProvider<CameraDataComponent>(),
+            new ComponentProvider<PlayerCameraData>(),
             new ComponentProvider<UnitVelocity>(),
         };
 

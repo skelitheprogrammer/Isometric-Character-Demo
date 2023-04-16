@@ -3,6 +3,9 @@ using Common.TimeService;
 using Common.Utils;
 using Reflex;
 using Reflex.Scripts;
+using Skillitronic.LeoECSLite.EntityDescriptors.Factory;
+using Skillitronic.LeoECSLite.GameObjectResourceManager;
+using Skillitronic.LeoECSLite.GameObjectResourceManager.Factory;
 using UnityEngine;
 
 namespace Content.Installers
@@ -17,15 +20,16 @@ namespace Content.Installers
             GameplayActionsRegistrar gameplayActionsRegistrar = new(playerActions.Gameplay);
             InputStateControlService inputStateControl = new(playerActions);
             TimeService timeService = new();
-        
+            IGameObjectFactory factory = new GameObjectFactory();
+            GameObjectResourceManager resourceManager = new(factory);
+            
             inputStateControl.Enable();
+            container.BindInstance(resourceManager);
             container.BindInstance(inputStateControl);
+            container.BindSingleton<IDescriptorEntityFactory, DescriptorEntityFactory>();
             container.BindInstance(gameplayActionsRegistrar);
             container.BindInstance(timeService);
             container.BindInstance(_gameData.PlayerData);
-            container.BindInstance(_gameData.PlayerData.MovementData);
-            container.BindInstance(_gameData.PlayerData.RotationData);
-            container.BindInstance(_gameData.PlayerData.CameraData);
         }
     }
 }

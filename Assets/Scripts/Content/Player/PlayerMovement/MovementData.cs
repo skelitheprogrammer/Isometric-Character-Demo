@@ -1,7 +1,7 @@
 ﻿namespace Content.Player.PlayerMovement
 {
     [System.Serializable]
-    public class PlayerMovementData
+    public struct PlayerMovementData
     {
         public float MoveSpeed;
     }

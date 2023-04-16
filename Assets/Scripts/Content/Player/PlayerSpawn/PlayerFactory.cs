@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Common.Utils;
 using Common.Utils.Components;
 using Content.Player.PlayerCamera;
 using Content.Player.PlayerCamera.Components;
@@ -6,6 +7,7 @@ using Content.Unit.Components;
 using Leopotam.EcsLite;
 using Skillitronic.LeoECSLite.EntityDescriptors;
 using Skillitronic.LeoECSLite.EntityDescriptors.Factory;
+using Skillitronic.LeoECSLite.GameObjectResourceManager;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.AI;
@@ -15,17 +17,17 @@ namespace Content.Player.PlayerSpawn
     public class PlayerFactory
     {
         private readonly IDescriptorEntityFactory _entityFactory;
+        private readonly GameObjectResourceManager _resourceManager;
         private readonly EcsWorld _world;
 
         private readonly PlayerData _playerData;
-        private readonly PlayerCameraData _playerCameraData;
 
-        public PlayerFactory(IDescriptorEntityFactory entityFactory, EcsWorld world, PlayerData playerData, PlayerCameraData playerCameraData)
+        public PlayerFactory(IDescriptorEntityFactory entityFactory, EcsWorld world, PlayerData playerData, GameObjectResourceManager resourceManager)
         {
             _entityFactory = entityFactory;
             _world = world;
             _playerData = playerData;
-            _playerCameraData = playerCameraData;
+            _resourceManager = resourceManager;
         }
 
         public async Task<(int playerEntity, int cameraEntity)> Build(Vector3 playerPosition, Quaternion playerRotation)
@@ -70,13 +72,17 @@ namespace Content.Player.PlayerSpawn
                 {
                     GameObject = playerModel,
                 });
+                
+                playerInit.InitComponent(_playerData.RotationData);
+                
+                playerInit.InitComponent(_playerData.MovementData);
 
                 return playerInit.Entity;
             }
 
             async Task<GameObject> CreatePlayerModel(AssetReference reference)
             {
-                GameObject gameObject = await Addressables.InstantiateAsync(reference).Task;
+                GameObject gameObject = await _resourceManager.Build(reference.GetAddressFromAssetReference());
                 gameObject.transform.SetPositionAndRotation(position, rotation);
 
                 return gameObject;
@@ -88,6 +94,7 @@ namespace Content.Player.PlayerSpawn
         private async Task<int> CreateCamera(Vector3 playerPosition)
         {
             GameObject cameraModel = await CreateCameraModel(_playerData.CameraPrefab);
+            
             Vector3 initialCameraPosition = cameraModel.transform.position;
             Vector3 finalPosition = initialCameraPosition + playerPosition;
             cameraModel.transform.position = finalPosition;
@@ -98,10 +105,10 @@ namespace Content.Player.PlayerSpawn
             {
                 EntityInitializer cameraInit = _entityFactory.Create<PlayerCameraEntityDescriptor>(_world);
 
-                cameraInit.InitComponent(new CameraDataComponent
+                cameraInit.InitComponent(new PlayerCameraData
                 {
                     CameraOffset = initialCameraPosition,
-                    CameraTravelSpeed = _playerCameraData.CameraSpeed,
+                    CameraTravelSpeed = _playerData.PlayerCameraData.CameraTravelSpeed,
                 });
 
                 cameraInit.InitComponent(new PositionComponent
@@ -118,13 +125,13 @@ namespace Content.Player.PlayerSpawn
                 {
                     GameObject = cameraModel,
                 });
-
+                
                 return cameraInit.Entity;
             }
 
             async Task<GameObject> CreateCameraModel(AssetReference reference)
             {
-                return await Addressables.InstantiateAsync(reference).Task;
+                return await _resourceManager.Build(reference.GetAddressFromAssetReference());
             }
 
             return cameraEntity;

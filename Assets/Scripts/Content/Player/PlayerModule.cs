@@ -1,5 +1,6 @@
 ﻿using Common.EcsSystemGroups;
 using Common.TimeService;
+using Content.Player.PlayerCamera;
 using Content.Player.PlayerMovement;
 using Leopotam.EcsLite;
 
@@ -9,11 +10,12 @@ namespace Content.Player
     {
         public IEcsSystem[] Systems { get; }
 
-        public PlayerModule(TimeService timeService, PlayerMovementData movementData, PlayerRotationData rotationData)
+        public PlayerModule(TimeService timeService)
         {
             Systems = new IEcsSystem[]
             {
-                new PlayerMovementSystemGroup(timeService, movementData, rotationData),
+                new PlayerMovementSystemGroup(timeService),
+                new PlayerCameraModule()
             };
         }
     }

@@ -1,5 +1,7 @@
-﻿using Common.Utils.Components;
+﻿using Common.Collision.Components;
+using Common.Utils.Components;
 using Content.Player.Components;
+using Content.Player.PlayerMovement;
 using Content.Player.PlayerMovement.Components;
 using Content.Unit;
 using Content.Unit.Components;
@@ -18,6 +20,9 @@ namespace Content.Player
             new ComponentProvider<RotationComponent>(),
             new ComponentProvider<DirectionComponent>(),
             new ComponentProvider<MoveInputComponent>(),
+            new ComponentProvider<PlayerMovementData>(),
+            new ComponentProvider<PlayerRotationData>(),
+            new ComponentProvider<CollisionComponent>(),
             new EntityDescriptorExtender<UnitEntityDescriptor>(),
         };
 

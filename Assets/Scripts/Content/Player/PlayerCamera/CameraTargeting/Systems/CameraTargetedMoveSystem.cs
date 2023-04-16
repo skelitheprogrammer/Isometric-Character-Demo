@@ -17,7 +17,7 @@ namespace Content.Player.PlayerCamera.CameraTargeting.Systems
 
         private EcsPool<PositionComponent> _positionPool;
         private EcsPool<EntityTargetComponent> _targetPool;
-        private EcsPool<CameraDataComponent> _cameraDataPool;
+        private EcsPool<PlayerCameraData> _cameraDataPool;
         private EcsPool<UnitVelocity> _unitVelocityPool;
 
         public void Init(IEcsSystems systems)
@@ -25,7 +25,7 @@ namespace Content.Player.PlayerCamera.CameraTargeting.Systems
             _world = systems.GetWorld();
             _cameraFilter = _world.Filter<PlayerCameraTag>().Inc<CameraTag>().Inc<UnitVelocity>().Inc<EntityTargetComponent>().Exc<IgnoreEntityTarget>().End();
             _targetPool = _world.GetPool<EntityTargetComponent>();
-            _cameraDataPool = _world.GetPool<CameraDataComponent>();
+            _cameraDataPool = _world.GetPool<PlayerCameraData>();
             _positionPool = _world.GetPool<PositionComponent>();
             _unitVelocityPool = _world.GetPool<UnitVelocity>();
         }
@@ -41,9 +41,9 @@ namespace Content.Player.PlayerCamera.CameraTargeting.Systems
 
                 ref Vector3 position = ref _positionPool.Get(i).Position;
 
-                CameraDataComponent cameraDataComponent = _cameraDataPool.Get(i);
-                Vector3 cameraOffset = cameraDataComponent.CameraOffset;
-                float cameraSpeed = cameraDataComponent.CameraTravelSpeed;
+                PlayerCameraData playerCameraData = _cameraDataPool.Get(i);
+                Vector3 cameraOffset = playerCameraData.CameraOffset;
+                float cameraSpeed = playerCameraData.CameraTravelSpeed;
                 
                 ref Vector3 cameraVelocity = ref _unitVelocityPool.Get(i).Velocity;
 

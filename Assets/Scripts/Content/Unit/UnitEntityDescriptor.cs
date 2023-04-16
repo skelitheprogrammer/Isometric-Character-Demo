@@ -1,4 +1,4 @@
-﻿using Common.Utils.Components;
+﻿using Common.Utils;
 using Content.Unit.Components;
 using Skillitronic.LeoECSLite.EntityDescriptors;
 using Skillitronic.LeoECSLite.EntityDescriptors.ComponentProviders;

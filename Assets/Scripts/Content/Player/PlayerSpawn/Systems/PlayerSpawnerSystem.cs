@@ -1,11 +1,11 @@
 ﻿using Common.Utils.Components;
 using Common.Utils.TargetSystem;
 using Content.Player.PlayerCamera;
-using Content.Player.PlayerCamera.CameraTargeting;
 using Content.SpawnPoints;
 using Content.SpawnPoints.Components;
 using Leopotam.EcsLite;
 using Skillitronic.LeoECSLite.EntityDescriptors.Factory;
+using Skillitronic.LeoECSLite.GameObjectResourceManager;
 using UnityEngine;
 
 namespace Content.Player.PlayerSpawn.Systems
@@ -14,28 +14,27 @@ namespace Content.Player.PlayerSpawn.Systems
     {
         private readonly PlayerData _playerData;
         private readonly IDescriptorEntityFactory _entityFactory;
-        private readonly PlayerCameraData _playerCameraData;
         private readonly EntityTargetService _entityTargetService;
+        private readonly GameObjectResourceManager _resourceManager;
 
-        private PlayerFactory _playerFactory;
         private EcsFilter _spawnPoints;
 
         private EcsPool<PositionComponent> _positionPool;
         private EcsPool<RotationComponent> _rotationPool;
         private EcsPool<SpawnTypeComponent> _spawnTypePool;
 
-        public PlayerSpawnerSystem(PlayerData playerData, IDescriptorEntityFactory entityFactory, PlayerCameraData playerCameraData, EntityTargetService entityTargetService)
+        public PlayerSpawnerSystem(PlayerData playerData, IDescriptorEntityFactory entityFactory, EntityTargetService entityTargetService, GameObjectResourceManager resourceManager)
         {
             _entityFactory = entityFactory;
             _playerData = playerData;
-            _playerCameraData = playerCameraData;
             _entityTargetService = entityTargetService;
+            _resourceManager = resourceManager;
         }
 
         public async void Init(IEcsSystems systems)
         {
             EcsWorld world = systems.GetWorld();
-            _playerFactory = new PlayerFactory(_entityFactory, world, _playerData, _playerCameraData);
+            PlayerFactory playerFactory = new(_entityFactory, world, _playerData, _resourceManager);
 
             _spawnPoints = world.Filter<SpawnTypeComponent>().Inc<PositionComponent>().Inc<RotationComponent>().End();
             _positionPool = world.GetPool<PositionComponent>();
@@ -50,11 +49,12 @@ namespace Content.Player.PlayerSpawn.Systems
                 {
                     continue;
                 }
-                
+
                 Vector3 position = _positionPool.Get(spawnPoint).Position;
                 Quaternion rotation = _rotationPool.Get(spawnPoint).Rotation;
-                (int playerEntity, int cameraEntity) = await _playerFactory.Build(position, rotation);
-                _entityTargetService.SetTarget(cameraEntity,playerEntity);
+                (int playerEntity, int cameraEntity) = await playerFactory.Build(position, rotation);
+
+                _entityTargetService.SetTarget(cameraEntity, playerEntity);
                 _entityTargetService.SetTarget(playerEntity, cameraEntity);
             }
         }

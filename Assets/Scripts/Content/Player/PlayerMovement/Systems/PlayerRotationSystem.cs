@@ -10,7 +10,6 @@ namespace Content.Player.PlayerMovement.Systems
 {
     public class PlayerRotationSystem : IEcsInitSystem, IEcsRunSystem
     {
-        private readonly PlayerRotationData _rotationData;
         private readonly TimeService _timeService;
 
         private EcsWorld _world;
@@ -19,21 +18,22 @@ namespace Content.Player.PlayerMovement.Systems
         private EcsPool<EntityTargetComponent> _targetPool;
         private EcsPool<MoveInputComponent> _moveInputPool;
         private EcsPool<DirectionComponent> _directionPool;
+        private EcsPool<PlayerRotationData> _rotationDataPool;
 
-        public PlayerRotationSystem(TimeService timeService, PlayerRotationData rotationData)
+        public PlayerRotationSystem(TimeService timeService)
         {
-            _rotationData = rotationData;
             _timeService = timeService;
         }
 
         public void Init(IEcsSystems systems)
         {
             _world = systems.GetWorld();
-            _playerFilter = _world.Filter<PlayerTag>().Inc<RotationComponent>().Inc<EntityTargetComponent>().Exc<IgnoreEntityTarget>().End();
+            _playerFilter = _world.Filter<PlayerTag>().Inc<RotationComponent>().Inc<EntityTargetComponent>().Inc<PlayerRotationData>().Exc<IgnoreEntityTarget>().End();
             _rotationPool = _world.GetPool<RotationComponent>();
             _targetPool = _world.GetPool<EntityTargetComponent>();
             _directionPool = _world.GetPool<DirectionComponent>();
             _moveInputPool = _world.GetPool<MoveInputComponent>();
+            _rotationDataPool = _world.GetPool<PlayerRotationData>();
         }
 
         public void Run(IEcsSystems systems)
@@ -46,7 +46,7 @@ namespace Content.Player.PlayerMovement.Systems
                 }
 
                 float deltaTime = _timeService.DeltaTime;
-                float rotationSpeed = _rotationData.RotationSpeed;
+                float rotationSpeed = _rotationDataPool.Get(i).RotationSpeed;
 
                 ref Quaternion rotation = ref _rotationPool.Get(i).Rotation;
 

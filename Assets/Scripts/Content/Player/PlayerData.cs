@@ -1,4 +1,5 @@
 ﻿using Content.Player.PlayerCamera;
+using Content.Player.PlayerCamera.Components;
 using Content.Player.PlayerMovement;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -14,6 +15,6 @@ namespace Content.Player
         [field: SerializeField] public PlayerMovementData MovementData { get; private set; }
         [field: SerializeField] public PlayerRotationData RotationData { get; private set; }
         
-        [field: SerializeField] public PlayerCameraData CameraData { get; private set; }
+        [field: SerializeField] public PlayerCameraData PlayerCameraData { get; private set; }
     }
 }

@@ -23,8 +23,9 @@ MonoBehaviour:
     m_SubObjectType: 
     m_EditorAssetChanged: 0
   <MovementData>k__BackingField:
-    MoveSpeed: 8
+    MoveSpeed: 10
   <RotationData>k__BackingField:
-    RotationSpeed: 10
-  <CameraData>k__BackingField:
-    CameraSpeed: 0.1
+    RotationSpeed: 8
+  <PlayerCameraData>k__BackingField:
+    CameraOffset: {x: 0, y: 0, z: 0}
+    CameraTravelSpeed: 0.2
